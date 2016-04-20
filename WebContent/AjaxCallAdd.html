@@ -1,0 +1,285 @@
+<HTML>
+<HEAD>
+ <TITLE>Test</TITLE>
+ <STYLE TYPE="text/css"> 
+      /*--- Redefinition du style de H2 */ 
+      div.response 
+      { 
+      	border: thin solid Blue;
+      	background: #DCDCDC;
+      	width:240px;
+      	height:160px;
+      } 
+    </STYLE> 
+</HEAD>
+
+<script type="text/javaScript" >
+
+//-----------------------------------------------------------------
+function getXHR() 
+{
+	//alert ( "getXHR()" );
+	var oXHR = null ;
+    if (window.ActiveXObject) 
+	{
+    	//--- Internet Explorer
+    	oXHR = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest)
+    {
+    	//--- Mozilla & Safari
+    	oXHR = new XMLHttpRequest();
+    }
+    //oXHR.id = "id"+n ; // OK with FF, ERROR with IE6 ActiveX
+   return oXHR ;
+}
+//-----------------------------------------------------------------
+function showXHR(o) 
+{
+	if ( o != null )
+	{
+		alert ( "XHR : readyState = " + o.readyState );
+	}
+	else
+	{
+		alert ( "XHR is null ! " );
+	}
+}
+	
+//-----------------------------------------------------------------
+function processResponse(oXHR, sType) 
+{
+	if ( oXHR.readyState == 4 )
+	{
+		var txt = document.getElementById("xhr_response");
+		txt.value = oXHR.responseText ;
+	
+		var type = oXHR.getResponseHeader("Content-Type") ;
+		//alert("Content-Type=" + type );
+		if ( type != null )
+		{
+			if ( type.indexOf("text/xml") >= 0 )
+			{
+				processResponseXml(oXHR) ;
+			}
+			else if ( type.indexOf("text/html") >= 0 )
+			{
+				processResponseHtml(oXHR) ;
+			}
+			/***
+			else if ( type.indexOf("text/plain") >= 0 )
+			{
+				var textType = oXHR.getResponseHeader("Text-Type") ;
+				if ( textType == "json" ) 
+				{
+					processResponseJson(oXHR) ;
+				}
+				else
+				{
+					processResponseText(oXHR) ;
+				}
+			}
+			***/
+			else if ( type.indexOf("application/json") >= 0 )
+			{
+				processResponseJson(oXHR) ;
+			}
+			else
+			{
+				processResponseText(oXHR) ;
+			}
+			
+		}
+	}
+	else
+	{
+		//alert("processResponse()  : state = " + oXHR.readyState );
+	}
+}
+//-----------------------------------------------------------------
+function processResponseText(oXHR) 
+{
+	//alert("type : TEXT" );
+	var text_area = document.getElementById("text_result_field");
+	//var div = document.getElementById("text_result");
+	if ( text_area != null )
+	{
+		text_area.value = oXHR.responseText ;
+	}
+	else
+	{
+		alert ( "Text Area not found !" );
+	}
+}
+//-----------------------------------------------------------------
+function processResponseHtml(oXHR) 
+{
+	//alert("type : HTML" );
+	var div = document.getElementById("html_result");
+	if ( div != null )
+	{
+		div.innerHTML = oXHR.responseText ;
+	}
+	else
+	{
+		alert ( "DIV result not found !" );
+	}
+}
+//-----------------------------------------------------------------
+function processResponseXml(oXHR) 
+{
+	//alert("type : XML" );
+	var result = oXHR.responseXML.getElementsByTagName("result").item(0).firstChild.data ;
+	var random = oXHR.responseXML.getElementsByTagName("random").item(0).firstChild.data ;
+
+	var result_field = document.getElementById("xml_result_field");
+	var random_field = document.getElementById("xml_random_field");
+
+	result_field.value = result ;
+	random_field.value = random ;
+}
+//-----------------------------------------------------------------
+function processResponseJson(oXHR) 
+{
+	//alert("type : JSON" );
+	var obj = eval( '(' + oXHR.responseText + ')' ); 
+	
+	var result_field = document.getElementById("json_result_field");
+	var random_field = document.getElementById("json_random_field");
+
+	result_field.value = obj.result ;
+	random_field.value = obj.random ;
+}
+
+//-----------------------------------------------------------------
+function call(oXHR, sMethod, sType, p1, p2, bFlag) 
+{
+	var sURL = "add?p1=" + p1 + "&p2=" + p2 ;
+	//var sURL = "http://localhost:8080/ajax-td/add?p1=" + p1 + "&p2=" + p2 ;
+	if ( oXHR != null )
+	{
+		if ( bFlag == null )
+		{
+			bFlag = true ;
+		}
+		//alert ( "call : " + sMethod + ", " + sType + ", " + ( bFlag ? "ASYNCHRONOUS" : "Synchronous" ) ) ;
+		try 
+		{
+			oXHR.open(sMethod, sURL, bFlag ); // true = ASYNCHRONOUS
+			//alert ( "XHR " + n + " ( after open ) : readyState = " + oXHR.readyState );
+
+			if ( sType != null )
+			{
+				oXHR.setRequestHeader("response-type", sType );
+			}
+			
+			oXHR.onreadystatechange = function() { processResponse(oXHR, sType) } ;
+			
+			oXHR.send(null);
+		} 
+		catch ( ex ) 
+		{
+			alert ("Exception : " + ex  );
+		}
+	}
+	else
+	{
+		alert ( "XHR " + n + " : not found ! " );
+	}
+}
+
+//-----------------------------------------------------------------
+function callAdd(type) 
+{
+	//alert("callAdd");
+	var p1 = document.getElementById("p1").value ;
+	var p2 = document.getElementById("p2").value ;
+	
+	//alert("callAdd : p1=" + p1 + ", p2=" + p2 + ", type=" + type );
+	// SYNCHRONOUS call
+	// POST to avoid browser cache effect
+	call(myXHR, 'POST', type, p1, p2, true); 
+}
+//-----------------------------------------------------------------
+var myXHR = getXHR();
+//-----------------------------------------------------------------
+
+</script>
+
+<body>
+
+<H2>AJAX call for Add servlet </H2>
+
+<table>
+
+<tr> <td> 
+ <input type="button" value="show XHR " onClick="showXHR(myXHR);" > 
+</td>  </tr>
+
+<tr> <td> 
+ <input type="button" value="GET, null, 10 + 5 (ASYNC = false)"  onClick="call(myXHR, 'GET', null, 10, 5, false);"  > 
+</td>  </tr>
+
+<tr> <td> 
+ <input type="button" value="GET, xml, 10 + 5 (ASYNC = false)"  onClick="call(myXHR, 'GET', 'xml', 10, 5, false);"  > 
+</td>  </tr>
+
+<tr> <td> 
+ <input type="button" value="GET, xml, 100 + 22 (ASYNC = true)"  onClick="call(myXHR, 'GET', 'xml', 100, 22, true);"  > 
+</td>  </tr>
+
+</table>
+
+<hr>
+
+<table>
+
+<tr> <td>
+<table>
+ <tr> <td> Paramètre <b>p1</b> : </td>  <td> <input id="p1"> </td> </tr>
+ <tr> <td> Paramètre <b>p2</b> : </td>  <td> <input id="p2"> </td> </tr>
+</table>
+</td> 
+<td>&nbsp;&nbsp;</td>
+<td>
+<table>
+ <tr> <td> XHR response : </td> </tr>
+ <tr> <td> <textarea id="xhr_response" style="width:500px; height:140px" ></textarea></td> </tr>
+</table>
+</td> </tr>
+
+
+</table>
+
+<table>
+<tr> 
+ <td> <input type="button" value="Add (TEXT)" onClick="callAdd('text');"  > </td>
+ <td> <input type="button" value="Add (HTML)" onClick="callAdd('html' );" > </td>
+ <td> <input type="button" value="Add (XML)"  onClick="callAdd('xml');"   > </td>
+ <td> <input type="button" value="Add (JSON)" onClick="callAdd('json');"  > </td>
+</tr>
+
+<tr> 
+ <td> <div id="text_result" class="response" >
+       <textarea id="text_result_field" style="width:200px; height:140px" ></textarea>
+       </div> </td>
+ <td> <div id="html_result" class="response" >&nbsp;</div> </td>
+ <td> <div id="xml_result"  class="response" >
+ 		Random : <br>
+       <input id="xml_random_field"><br>
+ 		Result : <br>
+       <input id="xml_result_field"><br>
+       </div> </td>
+ <td> <div id="json_result"  class="response" >
+ 		Random : <br>
+       <input id="json_random_field"><br>
+ 		Result : <br>
+       <input id="json_result_field"><br>
+       </div> </td>
+</tr>
+
+</table>
+
+<body>
+
+</HTML>

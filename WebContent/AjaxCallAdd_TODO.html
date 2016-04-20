@@ -1,0 +1,140 @@
+<HTML>
+<HEAD>
+ <TITLE>Test</TITLE>
+ <STYLE TYPE="text/css"> 
+      /*--- Redefinition du style de H2 */ 
+      div.response 
+      { 
+      	border: thin solid Blue;
+      	background: #DCDCDC;
+      	width:240px;
+      	height:160px;
+      } 
+    </STYLE> 
+</HEAD>
+
+<script type="text/javaScript" >
+
+//-----------------------------------------------------------------
+function getXHR() 
+{
+	alert ( "TODO" );
+}
+//-----------------------------------------------------------------
+function showXHR(o) 
+{
+	if ( o != null )
+	{
+		alert ( "XHR : readyState = " + o.readyState );
+	}
+	else
+	{
+		alert ( "XHR is null ! " );
+	}
+}
+	
+//-----------------------------------------------------------------
+function processResponse(oXHR, sType) 
+{
+	alert ( "TODO" );
+}
+//-----------------------------------------------------------------
+function processResponseText(oXHR) 
+{
+	alert ( "TODO" );
+}
+//-----------------------------------------------------------------
+function processResponseHtml(oXHR) 
+{
+	alert ( "TODO" );
+}
+//-----------------------------------------------------------------
+function processResponseXml(oXHR) 
+{
+	alert ( "TODO" );
+}
+//-----------------------------------------------------------------
+function processResponseJson(oXHR) 
+{
+	alert ( "TODO" );
+}
+
+//-----------------------------------------------------------------
+function call(oXHR, sMethod, sType, p1, p2, bFlag) 
+{
+	alert ( "TODO" );
+}
+
+//-----------------------------------------------------------------
+function callAdd(type) 
+{
+	//alert("callAdd");
+	var p1 = document.getElementById("p1").value ;
+	var p2 = document.getElementById("p2").value ;
+	
+	alert("callAdd : p1=" + p1 + ", p2=" + p2 + ", type=" + type );
+	// SYNCHRONOUS call
+	// POST to avoid browser cache effect
+	call(myXHR, 'POST', type, p1, p2, true); 
+}
+//-----------------------------------------------------------------
+var myXHR = getXHR();
+//-----------------------------------------------------------------
+
+</script>
+
+<body>
+
+<H2>AJAX call for Add servlet </H2>
+
+<table>
+
+<tr> <td>
+<table>
+ <tr> <td> Paramètre <b>p1</b> : </td>  <td> <input id="p1"> </td> </tr>
+ <tr> <td> Paramètre <b>p2</b> : </td>  <td> <input id="p2"> </td> </tr>
+</table>
+</td> 
+<td>&nbsp;&nbsp;</td>
+<td>
+<table>
+ <tr> <td> XHR response : </td> </tr>
+ <tr> <td> <textarea id="xhr_response" style="width:500px; height:140px" ></textarea></td> </tr>
+</table>
+</td> </tr>
+
+
+</table>
+
+<table>
+<tr> 
+ <td> <input type="button" value="Add (TEXT)" onClick="callAdd('text');"  > </td>
+ <td> <input type="button" value="Add (HTML)" onClick="callAdd('html' );" > </td>
+ <td> <input type="button" value="Add (XML)"  onClick="callAdd('xml');"   > </td>
+ <td> <input type="button" value="Add (JSON)" onClick="callAdd('json');"  > </td>
+</tr>
+
+<tr> 
+ <td> <div id="text_result" class="response" >
+       <textarea id="text_result_field" style="width:200px; height:140px" ></textarea>
+       </div> </td>
+ <td> <div id="html_result" class="response" >&nbsp;</div> </td>
+ <td> <div id="xml_result"  class="response" >
+ 		Random : <br>
+       <input id="xml_random_field"><br>
+ 		Result : <br>
+       <input id="xml_result_field"><br>
+       </div> </td>
+ <td> <div id="json_result"  class="response" >
+ 		Random : <br>
+       <input id="json_random_field"><br>
+ 		Result : <br>
+       <input id="json_result_field"><br>
+       </div> </td>
+</tr>
+
+</table>
+
+<body>
+
+</HTML>

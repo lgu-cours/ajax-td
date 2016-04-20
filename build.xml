@@ -1,0 +1,61 @@
+<project name="TD-AJAX" default="build-zip-todo">
+	<!-- basedir="." = Répertoire "BUILD" contenant ce "build.xml" -->
+
+	<property name="td_version"      value="1.4" />
+	
+	<!-- Definition des repertoire de distribution -->
+	<property name="java_src"      value="./src" />
+
+	<property name="build_dir"     value="./build" />
+	<property name="build_classes" value="${build_dir}/classes" />
+	
+	<property name="dist_dir"       value="./dist" />
+	<property name="zip_file_todo"  value="${dist_dir}/td_ajax-${td_version}-TODO.zip" />
+	<property name="zip_file_src"   value="${dist_dir}/td_ajax-${td_version}-SRC.zip" />
+
+	<!-- ============================================================================== -->
+	<!-- Initialisation                                                                 -->
+	<!-- ============================================================================== -->
+	<target name="init">
+		<echo message="ANT  version : ${ant.version}" />
+		<echo message="JAVA version : ${ant.java.version}" />
+
+		<mkdir dir="${build_dir}" />
+		<mkdir dir="${build_classes}" />
+
+		<mkdir dir="${dist_dir}" />
+
+	</target>
+
+
+	<!-- ============================================================================== -->
+	<!-- ZIP TODO                                                                       -->
+	<!-- ============================================================================== -->
+	<target name="build-zip-todo" depends="init">
+		<delete file="${zip_file_todo}" />
+		<zip destfile="${zip_file_todo}"  >	
+			<zipfileset dir="src/servlet"              prefix="src/servlet" />	
+			<zipfileset dir="WebContent/WEB-INF"                 prefix="WebContent/WEB-INF" />	
+			<zipfileset file="WebContent/index.html"             prefix="WebContent" />	
+			<zipfileset file="WebContent/response1.html"         prefix="WebContent" />	
+			<zipfileset file="WebContent/response2.txt"          prefix="WebContent" />	
+			<zipfileset file="WebContent/response3.jsp"          prefix="WebContent" />	
+			<zipfileset file="WebContent/AjaxCall_TODO.html"     prefix="WebContent" />	
+			<zipfileset file="WebContent/AjaxCallAdd_TODO.html"  prefix="WebContent" />	
+			<zipfileset file="WebContent/jquery-1.6.3.js"        prefix="WebContent" />	
+		</zip>
+	</target>
+
+	<!-- ============================================================================== -->
+	<!-- ZIP SRC                                                                        -->
+	<!-- ============================================================================== -->
+	<target name="build-zip-src" depends="init">
+		<delete file="${zip_file_src}" />
+		<zip destfile="${zip_file_src}"  >	
+			<zipfileset dir="src"         prefix="src" />	
+			<zipfileset dir="WebContent"  prefix="WebContent" />	
+			<zipfileset file="build.xml"  />	
+		</zip>
+	</target>
+
+</project>

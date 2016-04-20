@@ -1,0 +1,162 @@
+<HTML>
+<HEAD>
+ <TITLE>Test</TITLE>
+</HEAD>
+
+<script type="text/javaScript" >
+
+function getXHR() 
+{
+	alert ( "getXHR()" );
+	var oXHR = null ;
+    if (window.ActiveXObject) 
+	{
+    	//--- Internet Explorer
+    	oXHR = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest)
+    {
+    	//--- Mozilla & Safari
+    	oXHR = new XMLHttpRequest();
+    }
+    //oXHR.id = "id"+n ; // OK with FF, ERROR with IE6 ActiveX
+   return oXHR ;
+}
+function showXHR(o) 
+{
+	if ( o != null )
+	{
+		alert ( "XHR : readyState = " + o.readyState );
+	}
+	else
+	{
+		alert ( "XHR is null ! " );
+	}
+}
+	
+//var myXHR = getXHR();
+
+//------------------------------------------------------------------------------------
+// Synchronous call
+//------------------------------------------------------------------------------------
+function callSync( sURL ) 
+{
+	alert ( "callSync(" + sURL + ")" );
+	var oXHR = getXHR();
+	if ( oXHR != null )
+	{
+		try 
+		{
+			alert ( " callSync : before open : readyState = " + oXHR.readyState );
+			oXHR.open("GET", sURL, false ); // false = SYNCHRONOUS, true = ASYNCHRONOUS
+			alert ( " callSync : after open : readyState = " + oXHR.readyState );
+			oXHR.send(null);
+			alert ( " callSync : after send : readyState = " + oXHR.readyState );
+			alert ( " callSync : response : \n" + oXHR.responseText );
+		} 
+		catch ( ex ) 
+		{
+			alert ("callSync : Exception : " + ex  );
+		}
+	}
+	else
+	{
+		alert ( "callSync : XHR not found ! " );
+	}
+}
+
+//------------------------------------------------------------------------------------
+// Asynchronous call
+//------------------------------------------------------------------------------------
+function processResponse(oXHR) 
+{
+	if ( oXHR.readyState == 4 )
+	{
+        //document.getElementById('wait').style.visibility = "hidden";
+		alert("processResponse()  : state = " + oXHR.readyState + "\n" +
+			"Response : \n" + oXHR.responseText );
+	}
+	else
+	{
+        //document.getElementById('wait').style.visibility = "visible";
+		alert("processResponse()  : state = " + oXHR.readyState );
+	}
+}
+
+function callAsync( sURL ) 
+{
+	alert ( "callAsync(" + sURL + ")" );
+	var oXHR = getXHR() ;
+	if ( oXHR != null )
+	{
+		try 
+		{
+			alert ( " * callAsync : before open : readyState = " + oXHR.readyState );
+			oXHR.open("GET", sURL, true ); // false = SYNCHRONOUS, true = ASYNCHRONOUS
+			alert ( " * callAsync : after open : readyState = " + oXHR.readyState ); // 1
+			oXHR.onreadystatechange = function() { processResponse(oXHR) } ;
+			alert ( " * callAsync : before send : readyState = " + oXHR.readyState );
+			oXHR.send(null);
+			alert ( " * callAsync : after send : readyState = " + oXHR.readyState );
+		} 
+		catch ( ex ) 
+		{
+			alert ("callAsync : Exception : " + ex  );
+		}
+	}
+	else
+	{
+		alert ( "callAsync : XHR not found ! " );
+	}
+}
+
+
+</script>
+
+<body>
+
+<H2>AJAX call </H2>
+
+<table>
+
+<tr> <td> 
+ <input type="button" value="show XHR " onClick="showXHR(myXHR);" > 
+</td>  </tr>
+
+<tr> <td> 
+<hr>
+</td>  </tr>
+
+<tr> <td> 
+ <a href="javascript: callSync('response1.html') " >callSync('response1.html') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callSync('response2.txt') " >callSync('response2.txt') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callSync('response3.jsp') " >callSync('response3.jsp') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callSync('http://www.google.com') " >callSync('http://www.google.com') </a>
+ &nbsp; open : Exception 
+</td>  </tr>
+
+<tr> <td> 
+<hr>
+</td>  </tr>
+
+<tr> <td> 
+ <a href="javascript: callAsync('response1.html') " >callAsync('response1.html') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callAsync('response2.txt') " >callAsync('response2.txt') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callAsync('response3.jsp') " >callAsync('response3.jsp') </a>
+</td>  </tr>
+
+</table>
+
+<body>
+
+</HTML>

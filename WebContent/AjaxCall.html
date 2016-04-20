@@ -1,0 +1,229 @@
+<HTML>
+<HEAD>
+ <TITLE>Test</TITLE>
+</HEAD>
+
+<script type="text/javaScript" >
+
+function log(msg) 
+{
+	//alert ( msg );
+	console.log("[LOG] : " + msg);
+}
+function getXHR() 
+{
+	log ( "getXHR()" );
+	var oXHR = null ;
+    if (window.ActiveXObject) 
+	{
+    	//--- Internet Explorer
+    	oXHR = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest)
+    {
+    	//--- Mozilla & Safari
+    	oXHR = new XMLHttpRequest();
+    }
+    //oXHR.id = "id"+n ; // OK with FF, ERROR with IE6 ActiveX
+   return oXHR ;
+}
+function showXHR(o) 
+{
+	if ( o != null )
+	{
+		alert ( "XHR : readyState = " + o.readyState );
+	}
+	else
+	{
+		alert ( "XHR is null ! " );
+	}
+}
+	
+var myXHR = getXHR();
+
+function clearFields() 
+{
+	var xhr_readyState   = document.getElementById("xhr_readyState");
+	var xhr_httpStatus   = document.getElementById("xhr_httpStatus");
+	var xhr_responseText = document.getElementById("xhr_responseText");
+	xhr_readyState.value   = "" ;
+	xhr_httpStatus.value   = "" ;
+	xhr_responseText.value = "" ;
+}
+//------------------------------------------------------------------------------------
+// Synchronous call
+//------------------------------------------------------------------------------------
+function callSync( sURL ) 
+{
+	var xhr_readyState   = document.getElementById("xhr_readyState");
+	var xhr_httpStatus   = document.getElementById("xhr_httpStatus");
+	var xhr_responseText = document.getElementById("xhr_responseText");
+	
+	clearFields();
+	xhr_responseText.value = "EN ATTENTE DE LA REPONSE..." ; // Synchrone avec 1 seul thread => Jamais affiché 
+	
+	//alert ( "callSync(" + sURL + ")" );
+	var oXHR = myXHR ;
+	if ( oXHR != null )
+	{
+		try 
+		{
+			//alert ( " before open : readyState = " + oXHR.readyState );
+			oXHR.open("GET", sURL, false ); // false = SYNCHRONOUS, true = ASYNCHRONOUS
+			//alert ( " after open : readyState = " + oXHR.readyState );
+			oXHR.send(null);
+
+			xhr_readyState.value   = oXHR.readyState ;
+			xhr_httpStatus.value   = oXHR.status ;
+			if ( oXHR.status == 200 ) {
+				xhr_responseText.value = oXHR.responseText ;
+			}
+			else {
+				xhr_responseText.value = "ERREUR : status = " + oXHR.status;
+			}
+			//alert ( " after send : readyState = " + oXHR.readyState );
+			//alert ( " response : \n" + oXHR.responseText );
+		} 
+		catch ( ex ) 
+		{
+			alert ("Exception : " + ex  );
+		}
+	}
+	else
+	{
+		alert ( "XHR not found ! " );
+	}
+}
+
+//------------------------------------------------------------------------------------
+// Asynchronous call
+//------------------------------------------------------------------------------------
+function processResponse(oXHR) 
+{
+	var xhr_readyState   = document.getElementById("xhr_readyState");
+	var xhr_httpStatus   = document.getElementById("xhr_httpStatus");
+	var xhr_responseText = document.getElementById("xhr_responseText");
+
+	xhr_readyState.value = oXHR.readyState ;
+	if ( oXHR.readyState == 4 )
+	{
+		xhr_httpStatus.value   = oXHR.status ;
+        //document.getElementById('wait').style.visibility = "hidden";
+//		alert("processResponse()  : state = " + oXHR.readyState + "\n" +
+//			"Response : \n" + oXHR.responseText );
+		if ( oXHR.status == 200 ) {
+			xhr_responseText.value = oXHR.responseText ;
+		}
+		else {
+			xhr_responseText.value = "ERREUR : status = " + oXHR.status;
+		}
+	}
+}
+
+function callAsync( sURL ) 
+{
+	clearFields();
+	xhr_responseText.value = "EN ATTENTE DE LA REPONSE... \n Non bloqué \n Champs éditables" ;
+
+	//alert ( "callAsync(" + sURL + ")" );
+	var oXHR = myXHR ;
+	if ( oXHR != null )
+	{
+		try 
+		{
+			//alert ( " before open : readyState = " + oXHR.readyState );
+			oXHR.open("GET", sURL, true ); // false = SYNCHRONOUS, true = ASYNCHRONOUS
+			//alert ( " after open : readyState = " + oXHR.readyState ); // 1
+			oXHR.onreadystatechange = function() { processResponse(oXHR) } ;
+			//alert ( " before send : readyState = " + oXHR.readyState );
+			oXHR.send(null);
+			//alert ( " after send : readyState = " + oXHR.readyState );
+		} 
+		catch ( ex ) 
+		{
+			alert ("Exception : " + ex  );
+		}
+	}
+	else
+	{
+		alert ( "XHR not found ! " );
+	}
+}
+
+
+</script>
+
+<body>
+
+<H2>AJAX call </H2>
+
+<table>
+
+<tr> <td> 
+ <input type="button" value="show XHR " onClick="showXHR(myXHR);" > 
+ &nbsp;&nbsp;
+ <input type="button" value="clear fields " onClick="clearFields();" > 
+</td>  </tr>
+
+<tr> <td> 
+<hr>
+</td>  </tr>
+
+<tr> <td> 
+ <a href="javascript: callSync('response1.html') " >callSync('response1.html') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callSync('response2.txt') " >callSync('response2.txt') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callSync('response3.jsp') " >callSync('response3.jsp') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callSync('http://www.google.com') " >callSync('http://www.google.com') </a>
+ &nbsp; : Exception (serveur different - Cross Site Scripting) 
+</td>  </tr>
+
+<tr> <td> 
+<hr>
+</td>  </tr>
+
+<tr> <td> 
+ <a href="javascript: callAsync('response1.html') " >callAsync('response1.html') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callAsync('response2.txt') " >callAsync('response2.txt') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callAsync('response3.jsp') " >callAsync('response3.jsp') </a>
+</td>  </tr>
+<tr> <td> 
+ <a href="javascript: callAsync('http://www.google.com') " >callAsync('http://www.google.com') </a>
+ &nbsp; Http Status = 0  
+</td>  </tr>
+
+</table>
+<hr>
+<table>
+<tr> 
+<td>XHR readyState : </td>
+<td>
+       <input id="xhr_readyState" style="width:200px;" ></input>
+</td>
+</tr>
+<tr> 
+<td>XHR http status : </td>
+<td>
+       <input id="xhr_httpStatus" style="width:200px;" ></input>
+</td>
+</tr>
+<tr> 
+<td>XHR responseText :</td>
+<td>
+       <textarea id="xhr_responseText" style="width:400px; height:140px" ></textarea>
+</td>
+</tr>
+</table>
+
+<body>
+
+</HTML>
