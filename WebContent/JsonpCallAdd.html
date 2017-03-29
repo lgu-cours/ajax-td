@@ -1,0 +1,85 @@
+<HTML>
+<HEAD>
+ <TITLE>Test</TITLE>
+ <STYLE TYPE="text/css"> 
+      /*--- Redefinition du style de H2 */ 
+      div.response 
+      { 
+      	border: thin solid Blue;
+      	background: #DCDCDC;
+      	width:240px;
+      	height:160px;
+      } 
+    </STYLE> 
+</HEAD>
+
+<script type="text/javaScript" >
+function log(m) {
+	console.log(m);
+}
+//-----------------------------------------------------------
+// Generic function to call the server
+//-----------------------------------------------------------
+function callJSONP(url) {
+	log("--- callJSONP");
+	var scriptID = 'jsonpScript';
+	log('try to find script with id ' + scriptID);
+	var old = document.getElementById(scriptID);
+	if (old != null) {
+		log('script found');
+		old.parentNode.removeChild(old);
+		//delete old;
+		log('script deleted');
+	}
+	else {
+		log('script not found');
+	}
+	var head = document.getElementsByTagName("head")[0];
+	var script = document.createElement('script');
+	script.id   = scriptID;
+	script.type = 'text/javascript';
+	script.src  = url;
+	log('script ready, adding...');
+	// Add the <script> element, then call the server and execute the received script
+	head.appendChild(script);
+	log('script added.');
+}
+//-----------------------------------------------------------
+// 2 functions for "Add" request
+//-----------------------------------------------------------
+function callAdd() {
+	log("--- callAdd");
+	var p1 = document.getElementById("p1").value ;
+	var p2 = document.getElementById("p2").value ;
+	
+	var sURL = "addjsonp?p1=" + p1 + "&p2=" + p2 + "&f=processAddResponse" ;
+	log(" callAdd : URL = " + sURL );
+
+	callJSONP(sURL);
+}
+function processAddResponse(o) {
+	log("--- processAddResponse : " );
+	log(" . random = " + o.random ) ;
+	log(" . result = " + o.result ) ;
+	
+	document.getElementById("result_field").value = o.result ;
+	document.getElementById("random_field").value = o.random ;
+}
+</script>
+
+<body>
+
+<H2>JSONP call for Add servlet </H2>
+
+<table>
+ <tr> <td> Param <b>p1</b> : </td>  <td> <input id="p1"> </td> </tr>
+ <tr> <td> Param <b>p2</b> : </td>  <td> <input id="p2"> </td> </tr>
+ <tr> <td> <input type="button" value="Add" onClick="callAdd();" />  </td> <td> &nbsp; </td> </tr>
+
+ <tr> <td> Random : </td>  <td> <input id="random_field"> </td> </tr>
+ <tr> <td> Result : </td>  <td> <input id="result_field"> </td> </tr>
+</table>
+
+<body>
+
+</HTML>
