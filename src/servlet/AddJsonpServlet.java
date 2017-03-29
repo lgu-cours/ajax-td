@@ -15,30 +15,20 @@ public class AddJsonpServlet extends HttpServlet
     private static final long serialVersionUID = -8485701202623343322L;
 	
 	private static final String TEXT_CONTENT_TYPE = "text/plain";
-//	private static final String XML_CONTENT_TYPE  = "text/xml";
-//	private static final String HTML_CONTENT_TYPE = "text/html";
-//	private static final String JSON_CONTENT_TYPE = "application/json";	 // Official : IETF RFC-4627  
-
-//	private final static int TEXT = 1 ;
-//	private final static int XML =  2 ;
-//	private final static int HTML = 3 ;
-//	private final static int JSON = 4 ;
 	
     //-----------------------------------------------------------------------------
-    //--- Requête HTTP GET
+    //--- HTTP GET
     //-----------------------------------------------------------------------------
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        System.out.println("---> ADD : http GET ..." );
         process(request, response);
     }
 
     //-----------------------------------------------------------------------------
-    //--- Requête HTTP POST
+    //--- HTTP POST
     //-----------------------------------------------------------------------------
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        System.out.println("---> ADD : http POST ..." );
         process(request, response);
     }
 
@@ -60,14 +50,7 @@ public class AddJsonpServlet extends HttpServlet
     //-----------------------------------------------------------------------------
     private void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        //--- No cache
-//        response.setHeader ("Pragma", "no-cache");
-//        response.setHeader ("Cache-Control", "no-cache");
-//        response.setDateHeader ("Expires", 0);
-        
-        //--- Response type : "text", "xml", "html", "json"
-        try
-        {
+        try {
         	String f = request.getParameter("f");
         	if ( f == null ) {
         		f = "processJSONP";
@@ -80,8 +63,8 @@ public class AddJsonpServlet extends HttpServlet
         	double result = d1 + d2 ;
         	System.out.println( " result = " + result + " ( " + d1 + " + " + d2 + " ) ");
             printResponse(response, result, f);
-        } catch (Exception e)
-        {
+        } 
+        catch (Exception e) {
         	printError(response, e.getMessage());
         }
     }
@@ -91,7 +74,6 @@ public class AddJsonpServlet extends HttpServlet
     	int random = (int) ( Math.random() * 1000 ) ;
 	    PrintWriter out = response.getWriter();
 	    response.setContentType(TEXT_CONTENT_TYPE);
-	    //response.setHeader(HEADER_TEXT_TYPE, JSON_TEXT_TYPE );
 	    out.print(f + "(");
 	    out.print("{");
 	    out.print("\"random\" : \"" + random + "\" , ");
@@ -104,6 +86,6 @@ public class AddJsonpServlet extends HttpServlet
     {
 	    PrintWriter out = response.getWriter();
 	    response.setContentType(TEXT_CONTENT_TYPE);
-	    out.println("error : " + msg );
+	    out.println("alert('" + msg + "');");
     }
 }
